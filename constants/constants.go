@@ -1,0 +1,16 @@
+package constants
+
+const ID = "id"
+const Agency = "agency"
+const Start = "start"
+const End = "end"
+const Port = ":2525"
+const Number = "number"
+const ContentType = "Content-Type"
+const ApplicationJson = "application/json"
+const RefundPath = "/refunds"
+const RefundPathById = "/refunds/{id}"
+const RefundPathAgency = "/refunds/agency/"
+const RefundPathByTicket = "/refunds/ticket/"
+const Empty = ""
+const IdNotFound = "Id not found"

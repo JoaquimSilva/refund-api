@@ -1,0 +1,30 @@
+create table refunds (
+                         id                    serial primary key,
+                         agency_id             NUMERIC,
+                         date_requested        varchar,
+                         shipping_date         varchar,
+                         due_date              varchar,
+                         branch                NUMERIC,
+                         ticket_number         NUMERIC,
+                         passenger             varchar,
+                         reservation_code      varchar,
+                         status_code           NUMERIC,
+                         consolidator_id       NUMERIC,
+                         issue_consolidator_id NUMERIC,
+                         invoice_number        NUMERIC,
+                         refund_number         NUMERIC,
+                         reservation_id        NUMERIC,
+                         user_id               NUMERIC,
+                         net_value             float,
+                         processed             boolean DEFAULT false,
+                         internal              boolean DEFAULT false,
+                         notify_backoffice     boolean DEFAULT false,
+                         released              boolean DEFAULT false
+);
+insert into refunds(agency_id, date_requested, shipping_date, due_date, branch, ticket_number, passenger, reservation_code,
+                    status_code, consolidator_id, issue_consolidator_id, invoice_number, refund_number,
+                    reservation_id, user_id, net_value, processed, internal, notify_backoffice, released)
+values (5190, '2020-11-03 00:00:00.000000', '2020-11-03 00:00:00.000000', '2022-02-03 00:00:00.000000', 100,
+        '9570000111000', 'Silva/Crebson', 'HHHLLL', 2, 7, 7, 23223456, 98776654445, 23123123, 990022, 9490.2, true, false, true, true),
+       (261, '2022-01-03 00:00:00.000000', '2022-01-03 00:00:00.000000', '2022-02-03 00:00:00.000000', 150,
+        '1270000111000', 'Silva/silva', 'XPTOXP', 2, 7, 7, 23223, 987766542351, 2312234323, 3990022, 490.2, true, false, true, true);

@@ -29,3 +29,5 @@ No terminal:
 
 - Será necessário que o docker seja inicializado, com o comando *docker-compose up* .
 - Após o docker estar devidamente iniciado, na raiz do projeto executar o comando *go run main.go*.
+
+Para postagem de um registro de reembolso há o exemplo [Exemplo de post](https://github.com/JoaquimSilva/refund-api/blob/master/postRefund-model)

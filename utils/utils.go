@@ -34,3 +34,10 @@ func RefundIsValid(writer http.ResponseWriter, refund models.Refund) bool {
 	}
 	return false
 }
+
+func FindRegisterByTicket(writer http.ResponseWriter) {
+	writer.WriteHeader(http.StatusBadRequest)
+	_, err := writer.Write([]byte("We find refund register for this ticket number"))
+	CatchError(err)
+	return
+}

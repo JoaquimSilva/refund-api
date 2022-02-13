@@ -26,3 +26,11 @@ func FindByAgencyId(agency string, refunds []models.Refund) *gorm.DB {
 func FindByAgencyIdAndPerPeriod(agency string, start string, end string, refunds []models.Refund) *gorm.DB {
 	return DB.Where("agency_id = ? AND date_requested BETWEEN ? AND ? ", agency, start, end).Find(&refunds)
 }
+
+func FindByTicket(number string, refund models.Refund) *gorm.DB {
+	return DB.Where("ticket_number = ? ", number).Find(&refund)
+}
+
+func FindByTicket64(number int64, refund models.Refund) *gorm.DB {
+	return DB.Where("ticket_number = ? ", number).Find(&refund)
+}

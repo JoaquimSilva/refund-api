@@ -1,34 +1,124 @@
 package controller
 
 import (
-	"log"
+	"encoding/json"
+	"github.com/gorilla/mux"
 	"net/http"
 	"refund-api/constants"
 	"refund-api/database"
-	"refund-api/middleware"
-	"refund-api/service"
-
-	"github.com/gorilla/mux"
+	"refund-api/models"
+	"refund-api/utils"
 )
 
-func Initialization() {
-	router := mux.NewRouter()
-	router.Use(middleware.ContentTypeMiddleware)
+func GetAllRefund(writer http.ResponseWriter, _ *http.Request) {
 
-	router.HandleFunc(constants.RefundPath, service.GetAllRefund).Methods(http.MethodGet)
+	var refunds []models.Refund
 
-	router.HandleFunc(constants.RefundPathById, service.GetRefundById).Methods(http.MethodGet)
+	database.DB.Find(&refunds)
 
-	router.HandleFunc(constants.RefundPathById, service.UpdateRefund).Methods(http.MethodPut)
+	err := json.NewEncoder(writer).Encode(refunds)
+	utils.CatchError(err)
+}
 
-	router.HandleFunc(constants.RefundPath, service.AddRefund).Methods(http.MethodPost)
+func GetRefundById(writer http.ResponseWriter, request *http.Request) {
 
-	router.HandleFunc(constants.RefundPathById, service.DeleteRefund).Methods(http.MethodDelete)
+	var refund models.Refund
+	var id = mux.Vars(request)[constants.ID]
 
-	router.HandleFunc(constants.RefundPathAgency, service.GetRefundByAgency).Methods(http.MethodGet)
+	database.DB.Find(&refund, id)
 
-	router.HandleFunc(constants.RefundPathByTicket, service.FindRefundsPerTicketNumber).Methods(http.MethodGet)
+	if utils.RefundIsValid(writer, refund) {
+		return
+	}
 
-	database.ConnectDB()
-	log.Fatal(http.ListenAndServe(constants.Port, router))
+	err := json.NewEncoder(writer).Encode(refund)
+	utils.CatchError(err)
+}
+
+func UpdateRefund(writer http.ResponseWriter, request *http.Request) {
+
+	var refund models.Refund
+	var id = mux.Vars(request)[constants.ID]
+
+	database.DB.Find(&refund, id)
+
+	if utils.RefundIsValid(writer, refund) {
+		return
+	}
+
+	err := json.NewDecoder(request.Body).Decode(&refund)
+	utils.CatchError(err)
+	database.DB.Save(&refund)
+
+	err2 := json.NewEncoder(writer).Encode(refund)
+	utils.CatchError(err2)
+}
+
+func AddRefund(writer http.ResponseWriter, request *http.Request) {
+
+	var newRefund models.Refund
+	var refundBase models.Refund
+	err := json.NewDecoder(request.Body).Decode(&newRefund)
+	utils.CatchError(err)
+
+	ticketNumber := newRefund.TicketNumber
+	database.FindByTicket64(ticketNumber, refundBase)
+
+	if refundBase.Id > 0 {
+		utils.FindRegisterByTicket(writer)
+		return
+	} else {
+		database.DB.Create(&newRefund)
+	}
+
+	err2 := json.NewEncoder(writer).Encode(newRefund)
+	utils.CatchError(err2)
+}
+
+func DeleteRefund(_ http.ResponseWriter, request *http.Request) {
+
+	var refund models.Refund
+	var id = mux.Vars(request)[constants.ID]
+	database.DB.Delete(&refund, id)
+}
+
+func GetRefundByAgency(writer http.ResponseWriter, request *http.Request) {
+
+	var refunds []models.Refund
+
+	agency := request.URL.Query().Get(constants.Agency)
+	start := request.URL.Query().Get(constants.Start)
+	end := request.URL.Query().Get(constants.End)
+
+	if agency != constants.Empty &&
+		start == constants.Empty &&
+		end == constants.Empty {
+		database.FindByAgencyId(agency, refunds)
+	}
+	if start != constants.Empty &&
+		end != constants.Empty {
+		database.FindByAgencyIdAndPerPeriod(agency, start, end, refunds)
+	}
+	if refunds == nil {
+		utils.NotFound(writer)
+		return
+	}
+
+	err := json.NewEncoder(writer).Encode(refunds)
+	utils.CatchError(err)
+}
+
+func FindRefundsPerTicketNumber(writer http.ResponseWriter, request *http.Request) {
+
+	var refund models.Refund
+	number := request.URL.Query().Get(constants.Number)
+	database.FindByTicket(number, refund)
+
+	if refund.Id == 0 {
+		utils.NotFound(writer)
+		return
+	}
+
+	err := json.NewEncoder(writer).Encode(refund)
+	utils.CatchError(err)
 }

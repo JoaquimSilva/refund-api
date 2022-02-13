@@ -1,9 +1,7 @@
 package main
 
-import (
-	"refund-api/controller"
-)
+import "refund-api/routers"
 
 func main() {
-	controller.Initialization()
+	routers.Initialization()
 }

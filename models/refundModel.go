@@ -3,7 +3,7 @@ package models
 type Refund struct {
 	Id                  int     `json:"id"`
 	AgencyId            int64   `json:"agencyId"`
-	DateRequested       string  `json:"dateRequested"`
+	RequestedDate       string  `json:"dateRequested"`
 	ShippingDate        string  `json:"shippingDate"`
 	DueDate             string  `json:"dueDate"`
 	Branch              int64   `json:"branch"`
@@ -22,4 +22,17 @@ type Refund struct {
 	Internal            bool    `json:"internal"`
 	NotifyBackoffice    bool    `json:"notifyBackoffice"`
 	Released            bool    `json:"released"`
+}
+
+type RefundDto struct {
+	AgencyId            int64
+	Branch              int64
+	TicketNumber        int64
+	Passenger           string
+	ReservationCode     string
+	ConsolidatorId      int
+	IssueConsolidatorId int
+	ReservationId       int64
+	UserId              int64
+	Internal            bool
 }

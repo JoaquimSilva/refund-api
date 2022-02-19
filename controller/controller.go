@@ -8,6 +8,7 @@ import (
 	"refund-api/database"
 	"refund-api/models"
 	"refund-api/utils"
+	"time"
 )
 
 func GetAllRefund(writer http.ResponseWriter, _ *http.Request) {
@@ -58,6 +59,7 @@ func AddRefund(writer http.ResponseWriter, request *http.Request) {
 
 	var newRefund models.Refund
 	var refundBase models.Refund
+	var refundPersist models.Refund
 	err := json.NewDecoder(request.Body).Decode(&newRefund)
 	utils.CatchError(err)
 
@@ -68,10 +70,32 @@ func AddRefund(writer http.ResponseWriter, request *http.Request) {
 		utils.FindRegisterByTicket(writer)
 		return
 	} else {
-		database.DB.Create(&newRefund)
+
+		//date := time.Now()
+		refundPersist.AgencyId = newRefund.AgencyId
+		refundPersist.RequestedDate = time.Now().Format(time.RFC3339)
+		refundPersist.ShippingDate = time.RFC3339
+		refundPersist.DueDate = time.RFC3339
+		refundPersist.Branch = newRefund.Branch
+		refundPersist.TicketNumber = newRefund.TicketNumber
+		refundPersist.Passenger = newRefund.Passenger
+		refundPersist.ReservationCode = newRefund.ReservationCode
+		refundPersist.StatusCode = 1
+		refundPersist.ConsolidatorId = newRefund.ConsolidatorId
+		refundPersist.IssueConsolidatorId = newRefund.IssueConsolidatorId
+		refundPersist.InvoiceNumber = 0
+		refundPersist.ReservationId = newRefund.ReservationId
+		refundPersist.UserId = newRefund.UserId
+		refundPersist.NetValue = 0.00
+		refundPersist.Processed = false
+		refundPersist.Internal = false
+		refundPersist.NotifyBackoffice = true
+		refundPersist.Released = false
+
+		database.DB.Create(&refundPersist)
 	}
 
-	err2 := json.NewEncoder(writer).Encode(newRefund)
+	err2 := json.NewEncoder(writer).Encode(refundPersist)
 	utils.CatchError(err2)
 }
 

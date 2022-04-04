@@ -57,13 +57,13 @@ func UpdateRefund(writer http.ResponseWriter, request *http.Request) {
 
 func AddRefund(writer http.ResponseWriter, request *http.Request) {
 
-	var newRefund models.Refund
+	var newRefundDto models.RefundDto
 	var refundBase models.Refund
-	var refundPersist models.Refund
-	err := json.NewDecoder(request.Body).Decode(&newRefund)
+	var refund2Persist models.Refund
+	err := json.NewDecoder(request.Body).Decode(&newRefundDto)
 	utils.CatchError(err)
 
-	ticketNumber := newRefund.TicketNumber
+	ticketNumber := newRefundDto.TicketNumber
 	database.FindByTicket64(ticketNumber, refundBase)
 
 	if refundBase.Id > 0 {
@@ -72,30 +72,30 @@ func AddRefund(writer http.ResponseWriter, request *http.Request) {
 	} else {
 
 		//date := time.Now()
-		refundPersist.AgencyId = newRefund.AgencyId
-		refundPersist.RequestedDate = time.Now().Format(time.RFC3339)
-		refundPersist.ShippingDate = time.RFC3339
-		refundPersist.DueDate = time.RFC3339
-		refundPersist.Branch = newRefund.Branch
-		refundPersist.TicketNumber = newRefund.TicketNumber
-		refundPersist.Passenger = newRefund.Passenger
-		refundPersist.ReservationCode = newRefund.ReservationCode
-		refundPersist.StatusCode = 1
-		refundPersist.ConsolidatorId = newRefund.ConsolidatorId
-		refundPersist.IssueConsolidatorId = newRefund.IssueConsolidatorId
-		refundPersist.InvoiceNumber = 0
-		refundPersist.ReservationId = newRefund.ReservationId
-		refundPersist.UserId = newRefund.UserId
-		refundPersist.NetValue = 0.00
-		refundPersist.Processed = false
-		refundPersist.Internal = false
-		refundPersist.NotifyBackoffice = true
-		refundPersist.Released = false
+		refund2Persist.AgencyId = newRefundDto.AgencyId
+		refund2Persist.RequestedDate = time.Now().Format(time.RFC3339)
+		refund2Persist.ShippingDate = time.RFC3339
+		refund2Persist.DueDate = time.RFC3339
+		refund2Persist.Branch = newRefundDto.Branch
+		refund2Persist.TicketNumber = newRefundDto.TicketNumber
+		refund2Persist.Passenger = newRefundDto.Passenger
+		refund2Persist.ReservationCode = newRefundDto.ReservationCode
+		refund2Persist.StatusCode = 1
+		refund2Persist.ConsolidatorId = newRefundDto.ConsolidatorId
+		refund2Persist.IssueConsolidatorId = newRefundDto.IssueConsolidatorId
+		refund2Persist.InvoiceNumber = 0
+		refund2Persist.ReservationId = newRefundDto.ReservationId
+		refund2Persist.UserId = newRefundDto.UserId
+		refund2Persist.NetValue = 0.00
+		refund2Persist.Processed = false
+		refund2Persist.Internal = false
+		refund2Persist.NotifyBackoffice = newRefundDto.NotifyBackoffice
+		refund2Persist.Released = false
 
-		database.DB.Create(&refundPersist)
+		database.DB.Create(&refund2Persist)
 	}
 
-	err2 := json.NewEncoder(writer).Encode(refundPersist)
+	err2 := json.NewEncoder(writer).Encode(refund2Persist)
 	utils.CatchError(err2)
 }
 

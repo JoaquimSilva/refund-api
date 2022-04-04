@@ -1,9 +1,9 @@
 package models
 
 type Refund struct {
-	Id                  int     `json:"id"`
+	Id                  int     `json:"id" gorm:"primaryKey;index"`
 	AgencyId            int64   `json:"agencyId"`
-	RequestedDate       string  `json:"dateRequested"`
+	RequestedDate       string  `json:"dateRequested" gorm:"autoCreateTime"`
 	ShippingDate        string  `json:"shippingDate"`
 	DueDate             string  `json:"dueDate"`
 	Branch              int64   `json:"branch"`
@@ -14,7 +14,7 @@ type Refund struct {
 	ConsolidatorId      int     `json:"consolidatorId"`
 	IssueConsolidatorId int     `json:"issueConsolidatorId"`
 	InvoiceNumber       int64   `json:"invoiceNumber"`
-	RefundNumber        int64   `json:"refundNumber"`
+	RefundNumber        int64   `json:"refundNumber" gorm:"autoIncrement;index"`
 	ReservationId       int64   `json:"reservationId"`
 	UserId              int64   `json:"userId"`
 	NetValue            float64 `json:"netValue"`
@@ -35,4 +35,5 @@ type RefundDto struct {
 	ReservationId       int64
 	UserId              int64
 	Internal            bool
+	NotifyBackoffice    bool
 }

@@ -2,8 +2,6 @@ package tests
 
 import (
 	"fmt"
-	"github.com/gorilla/mux"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"refund-api/constants"
@@ -12,6 +10,10 @@ import (
 	"refund-api/models"
 	"strconv"
 	"testing"
+	"time"
+
+	"github.com/gorilla/mux"
+	"github.com/stretchr/testify/assert"
 )
 
 var ID int
@@ -32,10 +34,9 @@ func TestGetAllRefunds(t *testing.T) {
 	assert.Equal(t, http.StatusOK, resp.Code, "Error in test")
 }
 
-
 func TestRefundByID(t *testing.T) {
 	database.ConnectDB()
-	CreateRefundMock()
+	CreateDtoMock()
 	defer DeleteRefundMock()
 	router := Router()
 	router.HandleFunc(constants.RefundPathById, controller.GetRefundById).Methods(http.MethodGet)
@@ -53,27 +54,43 @@ func DeleteRefundMock() {
 	database.DB.Delete(&refund, ID)
 }
 
-func CreateRefundMock() {
-	refund := models.Refund{
-		AgencyId: 9876,
-		Passenger: "TESTE TESTE",
-		TicketNumber: 9570000111000,
-		ReservationCode: "12345690",
-		UserId: 123819,
-		Branch: 281,
-		StatusCode: 1,
-		RefundNumber: 328327748,
-		ReservationId: 8877667,
-		InvoiceNumber: 89876889,
-		ConsolidatorId: 7,
+func CreateDtoMock() {
+	dto := models.RefundDto{
+
+		AgencyId:            5190,
+		Branch:              100,
+		TicketNumber:        9570000111112,
+		Passenger:           "Silva/Whashinton",
+		ReservationCode:     "XTPTPO",
+		ConsolidatorId:      7,
 		IssueConsolidatorId: 7,
-		NetValue: 12903,
-		Internal: false,
-		Released: false,
-		Processed: false,
-		NotifyBackoffice: false,
+		ReservationId:       23123123,
+		UserId:              990022,
+		Internal:            true,
 	}
 
-	database.DB.Create(&refund)
-	ID = refund.Id
+	var toDataBase models.Refund
+
+	toDataBase.AgencyId = dto.AgencyId
+	toDataBase.RequestedDate = time.Now().Format("2006-01-02 15:04:05")
+	toDataBase.ShippingDate = time.Date(9999, 12, 31, 00, 00, 00, 00, time.UTC).String()
+	toDataBase.DueDate = time.Date(9999, 12, 31, 00, 00, 00, 00, time.UTC).String()
+	toDataBase.Branch = dto.Branch
+	toDataBase.TicketNumber = dto.TicketNumber
+	toDataBase.Passenger = dto.Passenger
+	toDataBase.ReservationCode = dto.ReservationCode
+	toDataBase.StatusCode = 1
+	toDataBase.ConsolidatorId = dto.ConsolidatorId
+	toDataBase.IssueConsolidatorId = dto.IssueConsolidatorId
+	toDataBase.InvoiceNumber = 0
+	toDataBase.ReservationId = dto.ReservationId
+	toDataBase.UserId = dto.UserId
+	toDataBase.NetValue = 0.00
+	toDataBase.Processed = false
+	toDataBase.Internal = false
+	toDataBase.NotifyBackoffice = true
+	toDataBase.Released = false
+
+	database.DB.Create(&toDataBase)
+	ID = toDataBase.Id
 }

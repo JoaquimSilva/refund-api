@@ -8,6 +8,7 @@ import (
 	"refund-api/database"
 	"refund-api/models"
 	"refund-api/utils"
+	"time"
 )
 
 func GetAllRefund(writer http.ResponseWriter, _ *http.Request) {
@@ -56,22 +57,45 @@ func UpdateRefund(writer http.ResponseWriter, request *http.Request) {
 
 func AddRefund(writer http.ResponseWriter, request *http.Request) {
 
-	var newRefund models.Refund
+	var newRefundDto models.RefundDto
 	var refundBase models.Refund
-	err := json.NewDecoder(request.Body).Decode(&newRefund)
+	var refund2Persist models.Refund
+	err := json.NewDecoder(request.Body).Decode(&newRefundDto)
 	utils.CatchError(err)
 
-	ticketNumber := newRefund.TicketNumber
+	ticketNumber := newRefundDto.TicketNumber
 	database.FindByTicket64(ticketNumber, refundBase)
 
 	if refundBase.Id > 0 {
 		utils.FindRegisterByTicket(writer)
 		return
 	} else {
-		database.DB.Create(&newRefund)
+
+		//date := time.Now()
+		refund2Persist.AgencyId = newRefundDto.AgencyId
+		refund2Persist.RequestedDate = time.Now().Format(time.RFC3339)
+		refund2Persist.ShippingDate = time.RFC3339
+		refund2Persist.DueDate = time.RFC3339
+		refund2Persist.Branch = newRefundDto.Branch
+		refund2Persist.TicketNumber = newRefundDto.TicketNumber
+		refund2Persist.Passenger = newRefundDto.Passenger
+		refund2Persist.ReservationCode = newRefundDto.ReservationCode
+		refund2Persist.StatusCode = 1
+		refund2Persist.ConsolidatorId = newRefundDto.ConsolidatorId
+		refund2Persist.IssueConsolidatorId = newRefundDto.IssueConsolidatorId
+		refund2Persist.InvoiceNumber = 0
+		refund2Persist.ReservationId = newRefundDto.ReservationId
+		refund2Persist.UserId = newRefundDto.UserId
+		refund2Persist.NetValue = 0.00
+		refund2Persist.Processed = false
+		refund2Persist.Internal = false
+		refund2Persist.NotifyBackoffice = newRefundDto.NotifyBackoffice
+		refund2Persist.Released = false
+
+		database.DB.Create(&refund2Persist)
 	}
 
-	err2 := json.NewEncoder(writer).Encode(newRefund)
+	err2 := json.NewEncoder(writer).Encode(refund2Persist)
 	utils.CatchError(err2)
 }
 

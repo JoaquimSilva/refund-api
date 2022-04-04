@@ -1,22 +1,13 @@
 {
     "agencyId": 9876,
-    "dateRequested": "2022-02-01",
-    "shippingDate": "2022-02-01",
-    "dueDate": "2022-02-06",
     "branch": 281,
     "ticketNumber": 9571212909090,
     "passenger": "silva/rafael",
     "reservationCode": "12345690",
-    "statusCode": 1,
     "consolidatorId": 7,
     "issueConsolidatorId": 7,
-    "invoiceNumber": 89876889,
-    "refundNumber": 328327748,
     "reservationId": 8877667,
     "userId": 123819,
-    "netValue": 12903.0,
-    "processed": false,
     "internal": false,
-    "notifyBackoffice": false,
-    "released": false
+    "notifyBackoffice": false
 }
